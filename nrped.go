@@ -95,7 +95,7 @@ func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {
 }
 func handleClient(conn net.Conn) {
 	// close connection on exit
-	defer conn.Close()
+    defer conn.Close()
     pkt_rcv := receivePackets(conn)
     fmt.Println(string(pkt_rcv.Command_buffer[:]))
     pkt_send := prepareToSend(string(pkt_rcv.Command_buffer[:]))
