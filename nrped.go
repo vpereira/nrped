@@ -2,23 +2,50 @@ package main
 
 import (
     "os"
+    "log"
     "fmt"
     "net"
     "bytes"
     "time"
     "math/rand"
+    "strings"
     "encoding/binary"
     "github.com/vpereira/nrped/common"
-
+    "github.com/jimlawless/cfg"
 )
 
 //it will be read from the config file
 //its for now its just a mockup
-var allowedCommands = map[string]int16 {
-    "check_ping":int16(0),
-    "check_foo":int16(1),
+var allowedCommands = map[string] string {}
+
+func read_commands(config map[string] string) map[string] string {
+    for key, value := range config {
+        if strings.HasPrefix(key,"command[") {
+            init_str := strings.Index(key,"[")
+            end_str  := strings.Index(key,"]")
+            fmt.Println(key[init_str+1:end_str])
+            allowedCommands[key[init_str+1:end_str]] = value
+        }
+    }
+    return allowedCommands
 }
 func main() {
+
+    if len(os.Args) != 2 {
+        fmt.Fprintf(os.Stderr, "Usage: %s config-file\n", os.Args[0])
+        os.Exit(1)
+    }
+
+    config_file := os.Args[1]
+	mymap := make(map[string]string)
+    err := cfg.Load(config_file, mymap)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    //extract the commands command[cmd_name] = "/bin/foobar"
+    read_commands(mymap)
 
 	service := ":5666"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
@@ -54,7 +81,7 @@ func IsCommandAllowed(cmd string) bool {
     }
 }
 
-func getCommand(cmd string) int16 {
+func getCommand(cmd string) string {
     return allowedCommands[cmd]
 }
 
@@ -67,6 +94,7 @@ func fillRandomData() string {
     }
     return string(buf)
 }
+
 func prepareToSend(cmd string) common.NrpePacket {
     pkt_send := common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.RESPONSE_PACKET,
         Crc32Value:0,ResultCode:common.STATE_UNKNOWN}
@@ -74,7 +102,9 @@ func prepareToSend(cmd string) common.NrpePacket {
        copy(pkt_send.CommandBuffer[:],common.PROGRAM_VERSION)
        pkt_send.ResultCode = common.STATE_OK
     } else if IsCommandAllowed(cmd) {
-        pkt_send.ResultCode = getCommand(cmd)
+        str_cmd := getCommand(cmd) //TODO it should be executed, and the result should be added to ResultCode
+        fmt.Println("executing:",str_cmd)
+        pkt_send.ResultCode = 0
         copy(pkt_send.CommandBuffer[:],fillRandomData())
     } else {
         pkt_send.ResultCode = common.STATE_CRITICAL
@@ -83,6 +113,7 @@ func prepareToSend(cmd string) common.NrpePacket {
     pkt_send.Crc32Value = common.DoCRC32(pkt_send)
     return pkt_send
 }
+
 func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
@@ -93,6 +124,7 @@ func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {
 	common.CheckError(err)
 
 }
+
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()

@@ -35,6 +35,7 @@ func prepareBufToSend(command string) *bytes.Buffer {
     }
   return buf
 }
+
 func handleResponse(conn net.Conn) common.NrpePacket {
     var pkt_rcv common.NrpePacket
     err := binary.Read(conn, binary.BigEndian, &pkt_rcv)
@@ -43,6 +44,7 @@ func handleResponse(conn net.Conn) common.NrpePacket {
 	}
     return pkt_rcv
 }
+
 func main() {
     if len(os.Args) < 2 {
         fmt.Printf("%s -h for help\n",os.Args[0])
