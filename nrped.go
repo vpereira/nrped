@@ -47,21 +47,21 @@ func main() {
     //extract the commands command[cmd_name] = "/bin/foobar"
     read_commands(mymap)
 
-	service := ":5666"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
-	common.CheckError(err)
+    service := ":5666"
+    tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
+    common.CheckError(err)
 
-	listener, err := net.ListenTCP("tcp", tcpAddr)
-	common.CheckError(err)
+    listener, err := net.ListenTCP("tcp", tcpAddr)
+    common.CheckError(err)
 
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			continue
-		}
-		// run as a goroutine
-		go handleClient(conn)
-	}
+    for {
+        conn, err := listener.Accept()
+        if err != nil {
+            continue
+        }
+        // run as a goroutine
+        go handleClient(conn)
+    }
 }
 
 func receivePackets(conn net.Conn) common.NrpePacket {
