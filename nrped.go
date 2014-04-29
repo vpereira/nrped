@@ -13,9 +13,10 @@ import (
 )
 
 //it will be read from the config file
-var allowedCommands = map[string]string {
-    "version":"0.01",
-    "ping":"pong",
+//its for now its just a mockup
+var allowedCommands = map[string]int16 {
+    "check_ping":int16(0),
+    "check_foo":int16(1),
 }
 func main() {
 
@@ -53,7 +54,7 @@ func IsCommandAllowed(cmd string) bool {
     }
 }
 
-func getCommand(cmd string) string {
+func getCommand(cmd string) int16 {
     return allowedCommands[cmd]
 }
 
@@ -67,20 +68,22 @@ func fillRandomData() string {
     return string(buf)
 }
 func prepareToSend(cmd string) common.NrpePacket {
-    var pkt_send common.NrpePacket
-    //here we will have to change it. Normally the command_buffer is as well random unless its a HELLO_COMMAND
+    pkt_send := common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
+        Crc32_value:0,Result_code:common.STATE_UNKNOWN}
+    if cmd == common.HELLO_COMMAND {
+       copy(pkt_send.Command_buffer[:],common.PROGRAM_VERSION)
+       pkt_send.Result_code = common.STATE_OK
+    }
     if IsCommandAllowed(cmd) {
-        pkt_send = common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
-        Crc32_value:0,Result_code:common.STATE_OK}
-        copy(pkt_send.Command_buffer[:],getCommand(cmd))
-        pkt_send.Crc32_value = common.Docrc32(pkt_send)
+        pkt_send.Result_code = getCommand(cmd)
+        copy(pkt_send.Command_buffer[:],fillRandomData())
     }else {
         pkt_send = common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
         Crc32_value:0,Result_code:common.STATE_CRITICAL}
         copy(pkt_send.Command_buffer[:],fillRandomData())
-        pkt_send.Crc32_value = common.Docrc32(pkt_send)
     }
 
+    pkt_send.Crc32_value = common.Docrc32(pkt_send)
     return pkt_send
 }
 func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {

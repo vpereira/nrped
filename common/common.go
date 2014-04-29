@@ -26,6 +26,8 @@ const VERSION_TWO = 2
 
 const HELLO_COMMAND = "version"
 
+const PROGRAM_VERSION = "0.02"
+
 type NrpePacket struct {
     Packet_version int16
     Packet_type int16
