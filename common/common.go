@@ -21,8 +21,9 @@ const RESPONSE_PACKET = 2
 //max buffer size 
 const MAX_PACKETBUFFER_LENGTH = 1024
 
-//check the version definitions in common.h
-const VERSION_TWO = 2
+const NRPE_PACKET_VERSION_3 =  3               /* packet version identifier */
+const NRPE_PACKET_VERSION_2 =  2
+const NRPE_PACKET_VERSION_1 =  1
 
 const HELLO_COMMAND = "version"
 

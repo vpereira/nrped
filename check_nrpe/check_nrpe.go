@@ -24,7 +24,7 @@ func prepareConnection(endpoint string) net.Conn {
 
 func prepareBufToSend(command string) *bytes.Buffer {
     var pkt_send common.NrpePacket
-    pkt_send = common.NrpePacket{PacketVersion:2,PacketType:common.QUERY_PACKET,Crc32Value:0,ResultCode:0}
+    pkt_send = common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.QUERY_PACKET,Crc32Value:0,ResultCode:0}
     copy(pkt_send.CommandBuffer[:],command)
     pkt_send.Crc32Value = common.DoCRC32(pkt_send)
 

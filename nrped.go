@@ -68,20 +68,18 @@ func fillRandomData() string {
     return string(buf)
 }
 func prepareToSend(cmd string) common.NrpePacket {
-    pkt_send := common.NrpePacket{PacketVersion:common.VERSION_TWO,PacketType:common.RESPONSE_PACKET,
+    pkt_send := common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.RESPONSE_PACKET,
         Crc32Value:0,ResultCode:common.STATE_UNKNOWN}
-     if cmd == common.HELLO_COMMAND {
+    if cmd == common.HELLO_COMMAND {
        copy(pkt_send.CommandBuffer[:],common.PROGRAM_VERSION)
        pkt_send.ResultCode = common.STATE_OK
     } else if IsCommandAllowed(cmd) {
         pkt_send.ResultCode = getCommand(cmd)
         copy(pkt_send.CommandBuffer[:],fillRandomData())
     } else {
-        pkt_send = common.NrpePacket{PacketVersion:common.VERSION_TWO,PacketType:common.RESPONSE_PACKET,
-        Crc32Value:0,ResultCode:common.STATE_CRITICAL}
+        pkt_send.ResultCode = common.STATE_CRITICAL
         copy(pkt_send.CommandBuffer[:],fillRandomData())
     }
-
     pkt_send.Crc32Value = common.DoCRC32(pkt_send)
     return pkt_send
 }
