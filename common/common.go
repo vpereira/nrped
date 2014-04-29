@@ -29,11 +29,11 @@ const HELLO_COMMAND = "version"
 const PROGRAM_VERSION = "0.02"
 
 type NrpePacket struct {
-    Packet_version int16
-    Packet_type int16
-    Crc32_value uint32
-    Result_code int16
-    Command_buffer [MAX_PACKETBUFFER_LENGTH]byte
+    PacketVersion int16
+    PacketType int16
+    Crc32Value uint32
+    ResultCode int16
+    CommandBuffer [MAX_PACKETBUFFER_LENGTH]byte
 }
 
 func CheckError(err error) {
@@ -43,7 +43,7 @@ func CheckError(err error) {
 	}
 }
 
-func Docrc32(pkt NrpePacket) uint32 {
+func DoCRC32(pkt NrpePacket) uint32 {
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.LittleEndian, &pkt); err != nil {
         fmt.Println(err)

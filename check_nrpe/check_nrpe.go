@@ -24,9 +24,9 @@ func prepareConnection(endpoint string) net.Conn {
 
 func prepareBufToSend(command string) *bytes.Buffer {
     var pkt_send common.NrpePacket
-    pkt_send = common.NrpePacket{Packet_version:2,Packet_type:common.QUERY_PACKET,Crc32_value:0,Result_code:0}
-    copy(pkt_send.Command_buffer[:],command)
-    pkt_send.Crc32_value = common.Docrc32(pkt_send)
+    pkt_send = common.NrpePacket{PacketVersion:2,PacketType:common.QUERY_PACKET,Crc32Value:0,ResultCode:0}
+    copy(pkt_send.CommandBuffer[:],command)
+    pkt_send.Crc32Value = common.DoCRC32(pkt_send)
 
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
@@ -42,7 +42,7 @@ func handleResponse(conn net.Conn) string {
 		fmt.Println("binary.Read failed:", err)
         return ""
 	}
-    return string(pkt_rcv.Command_buffer[:])
+    return string(pkt_rcv.CommandBuffer[:])
 }
 func main() {
     if len(os.Args) < 2 {

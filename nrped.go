@@ -68,21 +68,21 @@ func fillRandomData() string {
     return string(buf)
 }
 func prepareToSend(cmd string) common.NrpePacket {
-    pkt_send := common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
-        Crc32_value:0,Result_code:common.STATE_UNKNOWN}
+    pkt_send := common.NrpePacket{PacketVersion:common.VERSION_TWO,PacketType:common.RESPONSE_PACKET,
+        Crc32Value:0,ResultCode:common.STATE_UNKNOWN}
      if cmd == common.HELLO_COMMAND {
-       copy(pkt_send.Command_buffer[:],common.PROGRAM_VERSION)
-       pkt_send.Result_code = common.STATE_OK
+       copy(pkt_send.CommandBuffer[:],common.PROGRAM_VERSION)
+       pkt_send.ResultCode = common.STATE_OK
     } else if IsCommandAllowed(cmd) {
-        pkt_send.Result_code = getCommand(cmd)
-        copy(pkt_send.Command_buffer[:],fillRandomData())
+        pkt_send.ResultCode = getCommand(cmd)
+        copy(pkt_send.CommandBuffer[:],fillRandomData())
     } else {
-        pkt_send = common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
-        Crc32_value:0,Result_code:common.STATE_CRITICAL}
-        copy(pkt_send.Command_buffer[:],fillRandomData())
+        pkt_send = common.NrpePacket{PacketVersion:common.VERSION_TWO,PacketType:common.RESPONSE_PACKET,
+        Crc32Value:0,ResultCode:common.STATE_CRITICAL}
+        copy(pkt_send.CommandBuffer[:],fillRandomData())
     }
 
-    pkt_send.Crc32_value = common.Docrc32(pkt_send)
+    pkt_send.Crc32Value = common.DoCRC32(pkt_send)
     return pkt_send
 }
 func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {
@@ -99,6 +99,6 @@ func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
     pkt_rcv := receivePackets(conn)
-    pkt_send := prepareToSend(string(pkt_rcv.Command_buffer[:common.GetLen(pkt_rcv.Command_buffer[:])]))
+    pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
     sendPacket(conn,pkt_send)
 }
