@@ -52,4 +52,7 @@ func Docrc32(pkt NrpePacket) uint32 {
     return crc32.ChecksumIEEE(buf.Bytes())
 }
 
-
+// count the numbers of bytes until 0 is found
+func GetLen(b []byte) int {
+    return bytes.Index(b, []byte{0})
+}
