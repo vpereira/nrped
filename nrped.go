@@ -6,6 +6,7 @@ import (
     "net"
     "bytes"
     "time"
+    "strings"
     "math/rand"
     "encoding/binary"
     "github.com/vpereira/nrped/common"
@@ -70,14 +71,13 @@ func fillRandomData() string {
 func prepareToSend(cmd string) common.NrpePacket {
     pkt_send := common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
         Crc32_value:0,Result_code:common.STATE_UNKNOWN}
-    if cmd == common.HELLO_COMMAND {
+     if cmd[:len(common.HELLO_COMMAND)] == common.HELLO_COMMAND {
        copy(pkt_send.Command_buffer[:],common.PROGRAM_VERSION)
        pkt_send.Result_code = common.STATE_OK
-    }
-    if IsCommandAllowed(cmd) {
+    } else if IsCommandAllowed(cmd) {
         pkt_send.Result_code = getCommand(cmd)
         copy(pkt_send.Command_buffer[:],fillRandomData())
-    }else {
+    } else {
         pkt_send = common.NrpePacket{Packet_version:common.VERSION_TWO,Packet_type:common.RESPONSE_PACKET,
         Crc32_value:0,Result_code:common.STATE_CRITICAL}
         copy(pkt_send.Command_buffer[:],fillRandomData())
@@ -100,7 +100,6 @@ func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
     pkt_rcv := receivePackets(conn)
-    fmt.Println(string(pkt_rcv.Command_buffer[:]))
-    pkt_send := prepareToSend(string(pkt_rcv.Command_buffer[:]))
+    pkt_send := prepareToSend(strings.TrimSpace(string(pkt_rcv.Command_buffer[:])))
     sendPacket(conn,pkt_send)
 }
