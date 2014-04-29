@@ -16,9 +16,10 @@ import (
 
 //it will be read from the config file
 //its for now its just a mockup
-var allowedCommands = map[string] string {}
+var allowedCommands map[string]string
 
 func read_commands(config map[string] string) map[string] string {
+    allowedCommands = make(map[string]string)
     for key, value := range config {
         if strings.HasPrefix(key,"command[") {
             init_str := strings.Index(key,"[")
