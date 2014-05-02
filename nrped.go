@@ -14,8 +14,7 @@ import (
     "github.com/jimlawless/cfg"
 )
 
-//it will be read from the config file
-//its for now its just a mockup
+//it will hold the allowed commands specificed in the config file
 var allowedCommands map[string]string
 
 func read_commands(config map[string] string) map[string] string {
@@ -115,14 +114,17 @@ func prepareToSend(cmd string) common.NrpePacket {
     return pkt_send
 }
 
-func sendPacket(conn net.Conn, pkt_send common.NrpePacket) {
+func sendPacket(conn net.Conn, pkt_send common.NrpePacket) error {
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
         fmt.Println(err)
         os.Exit(1)
     }
     _, err := conn.Write([]byte(buf.Bytes()))
-	common.CheckError(err)
+    if err != nil {
+        return err
+    }
+    return nil
 
 }
 
@@ -131,5 +133,6 @@ func handleClient(conn net.Conn) {
     defer conn.Close()
     pkt_rcv := receivePackets(conn)
     pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
-    sendPacket(conn,pkt_send)
+    err := sendPacket(conn,pkt_send)
+	common.CheckError(err)
 }
