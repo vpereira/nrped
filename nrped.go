@@ -2,7 +2,6 @@ package main
 
 import (
     "os"
-    "log"
     "fmt"
     "net"
     "strings"
@@ -35,10 +34,7 @@ func main() {
     config_file := os.Args[1]
 	mymap := make(map[string]string)
     err := cfg.Load(config_file, mymap)
-
-    if err != nil {
-        log.Fatal(err)
-    }
+    common.CheckError(err)
 
     //extract the commands command[cmd_name] = "/bin/foobar"
     read_commands(mymap)
@@ -72,30 +68,23 @@ func getCommand(cmd string) string {
     return allowedCommands[cmd]
 }
 
-func prepareToSend(cmd string) common.NrpePacket {
-    pkt_send := common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.RESPONSE_PACKET,
-        Crc32Value:0,ResultCode:common.STATE_UNKNOWN}
-    if cmd == common.HELLO_COMMAND {
-       copy(pkt_send.CommandBuffer[:],common.PROGRAM_VERSION)
-       pkt_send.ResultCode = common.STATE_OK
-    } else if IsCommandAllowed(cmd) {
-        str_cmd := getCommand(cmd) //TODO it should be executed, and the result should be added to ResultCode
-        fmt.Println("executing:",str_cmd)
-        pkt_send.ResultCode = 0
-        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
-    } else {
-        pkt_send.ResultCode = common.STATE_CRITICAL
-        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
-    }
-    pkt_send.Crc32Value = common.DoCRC32(pkt_send)
-    return pkt_send
-}
-
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
     pkt_rcv := common.ReceivePacket(conn)
-    pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
+    cmd := string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])])
+    pkt_send := common.PrepareToSend(cmd,common.RESPONSE_PACKET)
+    if pkt_send.ResultCode == common.STATE_UNKNOWN { //its a response, but not to the HELLO_COMMAND
+        if IsCommandAllowed(cmd) {
+            str_cmd := getCommand(cmd)
+            fmt.Println("executing:",str_cmd)
+            pkt_send.ResultCode = common.STATE_OK //it will be updated with the return code from the executed command
+            copy(pkt_send.CommandBuffer[:],common.FillRandomData())
+        } else {
+            pkt_send.ResultCode = common.STATE_CRITICAL
+        }
+        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
+    }
     err := common.SendPacket(conn,pkt_send)
 	common.CheckError(err)
 }

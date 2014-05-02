@@ -67,9 +67,25 @@ func SendPacket(conn net.Conn, pkt_send NrpePacket) error {
         return err
     }
     return nil
-
 }
 
+func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
+    var pkt_send NrpePacket = NrpePacket{PacketVersion:NRPE_PACKET_VERSION_2,
+            Crc32Value:0,ResultCode:STATE_UNKNOWN}
+    if pkt_type == RESPONSE_PACKET {  //its a response
+        pkt_send.PacketType = RESPONSE_PACKET
+        if cmd == HELLO_COMMAND {
+           copy(pkt_send.CommandBuffer[:],PROGRAM_VERSION)
+           pkt_send.ResultCode = STATE_OK
+        }
+    } else {  // Query Packet
+        pkt_send.ResultCode = STATE_OK
+        pkt_send.PacketType = QUERY_PACKET
+        copy(pkt_send.CommandBuffer[:],cmd)
+    }
+    pkt_send.Crc32Value = DoCRC32(pkt_send)
+    return pkt_send
+}
 
 func FillRandomData() string {
     char := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

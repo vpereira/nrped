@@ -20,13 +20,6 @@ func prepareConnection(endpoint string) net.Conn {
     return nil
 }
 
-func prepareToSend(command string) common.NrpePacket {
-    var pkt_send common.NrpePacket
-    pkt_send = common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.QUERY_PACKET,Crc32Value:0,ResultCode:0}
-    copy(pkt_send.CommandBuffer[:],command)
-    pkt_send.Crc32Value = common.DoCRC32(pkt_send)
-    return pkt_send
-}
 
 func main() {
     if len(os.Args) < 2 {
@@ -40,7 +33,7 @@ func main() {
     goopt.Parse(nil)
     service := fmt.Sprintf("%s:%d",*host,*port)
     conn := prepareConnection(service)
-    pkt_to_send := prepareToSend(*command)
+    pkt_to_send := common.PrepareToSend(*command,common.QUERY_PACKET)
     err := common.SendPacket(conn,pkt_to_send)
 	common.CheckError(err)
     response_from_command := common.ReceivePacket(conn)
