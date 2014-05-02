@@ -36,15 +36,6 @@ func prepareBufToSend(command string) *bytes.Buffer {
   return buf
 }
 
-func handleResponse(conn net.Conn) common.NrpePacket {
-    var pkt_rcv common.NrpePacket
-    err := binary.Read(conn, binary.BigEndian, &pkt_rcv)
-	if err != nil {
-		fmt.Println("binary.Read failed:", err)
-	}
-    return pkt_rcv
-}
-
 func main() {
     if len(os.Args) < 2 {
         fmt.Printf("%s -h for help\n",os.Args[0])
@@ -60,7 +51,7 @@ func main() {
     conn := prepareConnection(service)
     _, err := conn.Write([]byte(buf.Bytes()))
 	common.CheckError(err)
-    response_from_command := handleResponse(conn)
+    response_from_command := common.ReceivePackets(conn)
     fmt.Println(response_from_command.CommandBuffer)
     os.Exit(int(response_from_command.ResultCode))
 }
