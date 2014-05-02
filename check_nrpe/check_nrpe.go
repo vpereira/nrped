@@ -4,10 +4,10 @@ import (
 	"net"
 	"os"
 	"fmt"
-    "flag"
     "bytes"
     "encoding/binary"
     "github.com/vpereira/nrped/common"
+    "github.com/droundy/goopt"
 )
 
 func prepareConnection(endpoint string) net.Conn {
@@ -51,11 +51,10 @@ func main() {
 		os.Exit(1)
 	}
 
-    var host = flag.String("host","127.0.0.1","The remote host running NRPE-Server")
-    var port = flag.Int("port",5666,"The remote port on which the NRPE-server listens")
-    var command = flag.String("command","version","The check command defined in the nrpe.cfg file you would like to trigger")
-    flag.Parse()
-
+    var host = goopt.String([]string{"-H","--host"},"127.0.0.1","The remote host running NRPE-Server")
+    var port = goopt.Int([]string{"-p","--port"},5666,"The remote port on which the NRPE-server listens")
+    var command = goopt.String([]string{"-c","--command"},"version","The check command defined in the nrpe.cfg file you would like to trigger")
+    goopt.Parse(nil)
     service := fmt.Sprintf("%s:%d",*host,*port)
     buf := prepareBufToSend(*command)
     conn := prepareConnection(service)
