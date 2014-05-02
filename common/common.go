@@ -47,7 +47,7 @@ func CheckError(err error) {
 	}
 }
 
-func ReceivePackets(conn net.Conn) NrpePacket {
+func ReceivePacket(conn net.Conn) NrpePacket {
     pkt_rcv := new(NrpePacket)
 	err := binary.Read(conn, binary.BigEndian, pkt_rcv)
 	if err != nil {

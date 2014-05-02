@@ -110,7 +110,7 @@ func sendPacket(conn net.Conn, pkt_send common.NrpePacket) error {
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
-    pkt_rcv := common.ReceivePackets(conn)
+    pkt_rcv := common.ReceivePacket(conn)
     pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
     err := sendPacket(conn,pkt_send)
 	common.CheckError(err)
