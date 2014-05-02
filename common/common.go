@@ -47,6 +47,7 @@ func CheckError(err error) {
 	}
 }
 
+//todo return error as well
 func ReceivePacket(conn net.Conn) NrpePacket {
     pkt_rcv := new(NrpePacket)
 	err := binary.Read(conn, binary.BigEndian, pkt_rcv)
@@ -54,6 +55,19 @@ func ReceivePacket(conn net.Conn) NrpePacket {
 		fmt.Println("binary.Read failed:", err)
 	}
     return *pkt_rcv
+}
+
+func SendPacket(conn net.Conn, pkt_send NrpePacket) error {
+    buf := new(bytes.Buffer)
+    if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
+        fmt.Println(err)
+    }
+    _, err := conn.Write([]byte(buf.Bytes()))
+    if err != nil {
+        return err
+    }
+    return nil
+
 }
 
 

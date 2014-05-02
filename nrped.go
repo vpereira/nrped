@@ -5,9 +5,7 @@ import (
     "log"
     "fmt"
     "net"
-    "bytes"
     "strings"
-    "encoding/binary"
     "github.com/vpereira/nrped/common"
     "github.com/jimlawless/cfg"
 )
@@ -93,25 +91,11 @@ func prepareToSend(cmd string) common.NrpePacket {
     return pkt_send
 }
 
-func sendPacket(conn net.Conn, pkt_send common.NrpePacket) error {
-    buf := new(bytes.Buffer)
-    if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
-    _, err := conn.Write([]byte(buf.Bytes()))
-    if err != nil {
-        return err
-    }
-    return nil
-
-}
-
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
     pkt_rcv := common.ReceivePacket(conn)
     pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
-    err := sendPacket(conn,pkt_send)
+    err := common.SendPacket(conn,pkt_send)
 	common.CheckError(err)
 }

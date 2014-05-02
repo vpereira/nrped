@@ -4,8 +4,6 @@ import (
 	"net"
 	"os"
 	"fmt"
-    "bytes"
-    "encoding/binary"
     "github.com/vpereira/nrped/common"
     "github.com/droundy/goopt"
 )
@@ -22,18 +20,12 @@ func prepareConnection(endpoint string) net.Conn {
     return nil
 }
 
-func prepareBufToSend(command string) *bytes.Buffer {
+func prepareToSend(command string) common.NrpePacket {
     var pkt_send common.NrpePacket
     pkt_send = common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.QUERY_PACKET,Crc32Value:0,ResultCode:0}
     copy(pkt_send.CommandBuffer[:],command)
     pkt_send.Crc32Value = common.DoCRC32(pkt_send)
-
-    buf := new(bytes.Buffer)
-    if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
-        fmt.Println(err)
-        return nil
-    }
-  return buf
+    return pkt_send
 }
 
 func main() {
@@ -47,9 +39,9 @@ func main() {
     var command = goopt.String([]string{"-c","--command"},"version","The check command defined in the nrpe.cfg file you would like to trigger")
     goopt.Parse(nil)
     service := fmt.Sprintf("%s:%d",*host,*port)
-    buf := prepareBufToSend(*command)
     conn := prepareConnection(service)
-    _, err := conn.Write([]byte(buf.Bytes()))
+    pkt_to_send := prepareToSend(*command)
+    err := common.SendPacket(conn,pkt_to_send)
 	common.CheckError(err)
     response_from_command := common.ReceivePacket(conn)
     fmt.Println(response_from_command.CommandBuffer)
