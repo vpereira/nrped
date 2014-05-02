@@ -5,6 +5,9 @@ import (
 	"fmt"
     "hash/crc32"
     "bytes"
+    "net"
+    "math/rand"
+    "time"
     "encoding/binary"
 )
 
@@ -43,6 +46,27 @@ func CheckError(err error) {
 		os.Exit(1)
 	}
 }
+
+func ReceivePackets(conn net.Conn) NrpePacket {
+    pkt_rcv := new(NrpePacket)
+	err := binary.Read(conn, binary.BigEndian, pkt_rcv)
+	if err != nil {
+		fmt.Println("binary.Read failed:", err)
+	}
+    return *pkt_rcv
+}
+
+
+func FillRandomData() string {
+    char := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    rand.Seed(time.Now().UTC().UnixNano())
+    buf := make([]byte, 1024)
+    for i := 0; i < 1024; i++ {
+        buf[i] = char[rand.Intn(len(char)-1)]
+    }
+    return string(buf)
+}
+
 
 func DoCRC32(pkt NrpePacket) uint32 {
     buf := new(bytes.Buffer)

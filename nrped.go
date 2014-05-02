@@ -6,8 +6,6 @@ import (
     "fmt"
     "net"
     "bytes"
-    "time"
-    "math/rand"
     "strings"
     "encoding/binary"
     "github.com/vpereira/nrped/common"
@@ -64,15 +62,6 @@ func main() {
     }
 }
 
-func receivePackets(conn net.Conn) common.NrpePacket {
-    pkt_rcv := new(common.NrpePacket)
-	err := binary.Read(conn, binary.BigEndian, pkt_rcv)
-	if err != nil {
-		fmt.Println("binary.Read failed:", err)
-	}
-    return *pkt_rcv
-}
-
 func IsCommandAllowed(cmd string) bool {
     if _,ok := allowedCommands[cmd]; ok {
         return true
@@ -85,16 +74,6 @@ func getCommand(cmd string) string {
     return allowedCommands[cmd]
 }
 
-func fillRandomData() string {
-    char := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    rand.Seed(time.Now().UTC().UnixNano())
-    buf := make([]byte, 1024)
-    for i := 0; i < 1024; i++ {
-        buf[i] = char[rand.Intn(len(char)-1)]
-    }
-    return string(buf)
-}
-
 func prepareToSend(cmd string) common.NrpePacket {
     pkt_send := common.NrpePacket{PacketVersion:common.NRPE_PACKET_VERSION_2,PacketType:common.RESPONSE_PACKET,
         Crc32Value:0,ResultCode:common.STATE_UNKNOWN}
@@ -105,10 +84,10 @@ func prepareToSend(cmd string) common.NrpePacket {
         str_cmd := getCommand(cmd) //TODO it should be executed, and the result should be added to ResultCode
         fmt.Println("executing:",str_cmd)
         pkt_send.ResultCode = 0
-        copy(pkt_send.CommandBuffer[:],fillRandomData())
+        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
     } else {
         pkt_send.ResultCode = common.STATE_CRITICAL
-        copy(pkt_send.CommandBuffer[:],fillRandomData())
+        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
     }
     pkt_send.Crc32Value = common.DoCRC32(pkt_send)
     return pkt_send
@@ -131,7 +110,7 @@ func sendPacket(conn net.Conn, pkt_send common.NrpePacket) error {
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
-    pkt_rcv := receivePackets(conn)
+    pkt_rcv := common.ReceivePackets(conn)
     pkt_send := prepareToSend(string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])]))
     err := sendPacket(conn,pkt_send)
 	common.CheckError(err)
