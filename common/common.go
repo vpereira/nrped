@@ -3,12 +3,15 @@ package common
 import (
 	"os"
 	"fmt"
+    "io"
     "hash/crc32"
     "bytes"
     "net"
     "math/rand"
     "time"
     "encoding/binary"
+    "os/exec"
+    "strings"
 )
 
 //define states
@@ -110,4 +113,16 @@ func DoCRC32(pkt NrpePacket) uint32 {
 // count the numbers of bytes until 0 is found
 func GetLen(b []byte) int {
     return bytes.Index(b, []byte{0})
+}
+
+func ExecCommand(cmd_in string) (uint16, io.Writer) {
+    parts := strings.Fields(cmd_in)
+	head := parts[0]
+	parts = parts[1:len(parts)]
+    cmd := exec.Command(head,parts...)
+    err := cmd.Run()
+    if err != nil {
+        return uint16(2),cmd.Stdout
+    }
+    return uint16(0),cmd.Stdout
 }
