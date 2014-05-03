@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net"
-	"os"
-	"fmt"
+    "net"
+    "os"
+    "fmt"
     "github.com/vpereira/nrped/common"
     "github.com/droundy/goopt"
 )
