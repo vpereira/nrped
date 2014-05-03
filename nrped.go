@@ -32,7 +32,7 @@ func main() {
     }
 
     config_file := os.Args[1]
-	mymap := make(map[string]string)
+    mymap := make(map[string]string)
     err := cfg.Load(config_file, mymap)
     common.CheckError(err)
 
