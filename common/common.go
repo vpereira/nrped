@@ -71,8 +71,7 @@ func SendPacket(conn net.Conn, pkt_send NrpePacket) error {
     if err := binary.Write(buf, binary.BigEndian, &pkt_send); err != nil {
         fmt.Println(err)
     }
-    _, err := conn.Write([]byte(buf.Bytes()))
-    if err != nil {
+    if _, err := conn.Write([]byte(buf.Bytes())); err != nil {
         return err
     }
     return nil
@@ -124,8 +123,7 @@ func ExecCommand(cmd_in string) (uint16, io.Writer) {
 	head := parts[0]
 	parts = parts[1:len(parts)]
     cmd := exec.Command(head,parts...)
-    err := cmd.Run()
-    if err != nil {
+    if err := cmd.Run(); err != nil {
         return uint16(2),cmd.Stdout
     }
     return uint16(0),cmd.Stdout

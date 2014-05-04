@@ -48,12 +48,12 @@ func main() {
     common.CheckError(err)
 
     for {
-        conn, err := listener.Accept()
-        if err != nil {
+        if conn, err := listener.Accept(); err != nil {
             continue
+        }else{
+            // run as a goroutine
+            go handleClient(conn)
         }
-        // run as a goroutine
-        go handleClient(conn)
     }
 }
 
