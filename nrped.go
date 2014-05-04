@@ -71,7 +71,7 @@ func getCommand(cmd string) string {
 func handleClient(conn net.Conn) {
 	// close connection on exit
     defer conn.Close()
-    pkt_rcv := common.ReceivePacket(conn)
+    pkt_rcv,_ := common.ReceivePacket(conn)
     cmd := string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])])
     pkt_send := common.PrepareToSend(cmd,common.RESPONSE_PACKET)
     if pkt_send.ResultCode == common.STATE_UNKNOWN { //its a response, but not to the HELLO_COMMAND
