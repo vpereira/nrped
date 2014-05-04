@@ -93,7 +93,7 @@ func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
         pkt_send.PacketType = QUERY_PACKET
         copy(pkt_send.CommandBuffer[:],cmd)
     }
-    pkt_send.Crc32Value = DoCRC32(pkt_send)
+    pkt_send.Crc32Value,_ = DoCRC32(pkt_send)
     return pkt_send
 }
 
@@ -108,13 +108,12 @@ func FillRandomData() string {
 }
 
 
-func DoCRC32(pkt NrpePacket) uint32 {
+func DoCRC32(pkt NrpePacket) (uint32, error) {
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.LittleEndian, &pkt); err != nil {
-        fmt.Println(err)
-        os.Exit(1)
+        return uint32(0), err
     }
-    return crc32.ChecksumIEEE(buf.Bytes())
+    return crc32.ChecksumIEEE(buf.Bytes()),nil
 }
 
 // count the numbers of bytes until 0 is found
