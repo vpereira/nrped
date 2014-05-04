@@ -15,21 +15,28 @@ import (
 )
 
 //define states
-const STATE_UNKNOWN =  3
-const STATE_CRITICAL = 2
-const STATE_WARNING = 1
-const STATE_OK = 0
+const (
+    STATE_OK = 0
+    STATE_WARNING = 1
+    STATE_CRITICAL = 2
+    STATE_UNKNOWN =  3
+)
 
 //packet type
-const QUERY_PACKET = 1
-const RESPONSE_PACKET = 2
+const ( 
+    QUERY_PACKET = 1
+    RESPONSE_PACKET = 2
+)
+
+//packet version
+const (
+    NRPE_PACKET_VERSION_1 =  1
+    NRPE_PACKET_VERSION_2 =  2
+    NRPE_PACKET_VERSION_3 =  3               /* packet version identifier */
+)
 
 //max buffer size 
 const MAX_PACKETBUFFER_LENGTH = 1024
-
-const NRPE_PACKET_VERSION_3 =  3               /* packet version identifier */
-const NRPE_PACKET_VERSION_2 =  2
-const NRPE_PACKET_VERSION_1 =  1
 
 const HELLO_COMMAND = "version"
 
