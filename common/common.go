@@ -23,7 +23,7 @@ const (
 )
 
 //packet type
-const ( 
+const (
     QUERY_PACKET = 1
     RESPONSE_PACKET = 2
 )
