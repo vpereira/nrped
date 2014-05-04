@@ -24,6 +24,7 @@ func read_commands(config map[string] string) map[string] string {
     }
     return allowedCommands
 }
+
 func main() {
 
     if len(os.Args) != 2 {

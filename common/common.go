@@ -106,7 +106,6 @@ func FillRandomData() string {
     return string(buf)
 }
 
-
 func DoCRC32(pkt NrpePacket) (uint32, error) {
     buf := new(bytes.Buffer)
     if err := binary.Write(buf, binary.LittleEndian, &pkt); err != nil {

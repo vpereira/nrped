@@ -22,6 +22,7 @@ func prepareConnection(endpoint string) net.Conn {
 
 
 func main() {
+
     if len(os.Args) < 2 {
         fmt.Printf("%s -h for help\n",os.Args[0])
 		os.Exit(1)
@@ -29,7 +30,9 @@ func main() {
 
     var host = goopt.String([]string{"-H","--host"},"127.0.0.1","The remote host running NRPE-Server")
     var port = goopt.Int([]string{"-p","--port"},5666,"The remote port on which the NRPE-server listens")
-    var command = goopt.String([]string{"-c","--command"},"version","The check command defined in the nrpe.cfg file you would like to trigger")
+    var command = goopt.String([]string{"-c","--command"},"version",
+    "The check command defined in the nrpe.cfg file you would like to trigger")
+
     goopt.Parse(nil)
     service := fmt.Sprintf("%s:%d",*host,*port)
     conn := prepareConnection(service)
