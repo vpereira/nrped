@@ -2,8 +2,9 @@ package common
 
 import (
 	"os"
+    "bufio"
 	"fmt"
-    "io"
+//    "io"
     "hash/crc32"
     "bytes"
     "net"
@@ -118,13 +119,14 @@ func GetLen(b []byte) int {
     return bytes.Index(b, []byte{0})
 }
 
-func ExecCommand(cmd_in string) (uint16, io.Writer) {
+func ExecuteCommand(cmd_in string) (int16, *bufio.Reader) {
     parts := strings.Fields(cmd_in)
 	head := parts[0]
 	parts = parts[1:len(parts)]
     cmd := exec.Command(head,parts...)
-    if err := cmd.Run(); err != nil {
-        return uint16(2),cmd.Stdout
+    cmd_stdout, _ := cmd.StdoutPipe()
+    if err := cmd.Start(); err != nil {
+        return int16(2),bufio.NewReader(cmd_stdout)
     }
-    return uint16(0),cmd.Stdout
+    return int16(0),bufio.NewReader(cmd_stdout)
 }

@@ -40,6 +40,6 @@ func main() {
     err := common.SendPacket(conn,pkt_to_send)
 	common.CheckError(err)
     response_from_command,_ := common.ReceivePacket(conn)
-    fmt.Println(response_from_command.CommandBuffer)
+    fmt.Println(string(response_from_command.CommandBuffer[:]))
     os.Exit(int(response_from_command.ResultCode))
 }

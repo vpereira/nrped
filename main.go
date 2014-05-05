@@ -79,12 +79,13 @@ func handleClient(conn net.Conn) {
         if IsCommandAllowed(cmd) {
             str_cmd := getCommand(cmd)
             fmt.Println("executing:",str_cmd)
-            pkt_send.ResultCode = common.STATE_OK //it will be updated with the return code from the executed command
-            copy(pkt_send.CommandBuffer[:],common.FillRandomData())
+            return_id,return_reader := common.ExecuteCommand(str_cmd)
+            pkt_send.ResultCode = return_id
+            read_line,_,_ := return_reader.ReadLine()
+            copy(pkt_send.CommandBuffer[:],read_line)
         } else {
             pkt_send.ResultCode = common.STATE_CRITICAL
         }
-        copy(pkt_send.CommandBuffer[:],common.FillRandomData())
     }
     err := common.SendPacket(conn,pkt_send)
 	common.CheckError(err)
