@@ -79,10 +79,9 @@ func handleClient(conn net.Conn) {
         if IsCommandAllowed(cmd) {
             str_cmd := getCommand(cmd)
             fmt.Println("executing:",str_cmd)
-            return_id,return_reader := common.ExecuteCommand(str_cmd)
+            return_id,return_stdout := common.ExecuteCommand(str_cmd)
             pkt_send.ResultCode = return_id
-            read_line,_,_ := return_reader.ReadLine()
-            copy(pkt_send.CommandBuffer[:],read_line)
+            copy(pkt_send.CommandBuffer[:],return_stdout)
         } else {
             pkt_send.ResultCode = common.STATE_CRITICAL
         }

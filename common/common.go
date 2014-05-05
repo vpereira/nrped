@@ -4,7 +4,7 @@ import (
 	"os"
     "bufio"
 	"fmt"
-//    "io"
+    "syscall"
     "hash/crc32"
     "bytes"
     "net"
@@ -119,14 +119,18 @@ func GetLen(b []byte) int {
     return bytes.Index(b, []byte{0})
 }
 
-func ExecuteCommand(cmd_in string) (int16, *bufio.Reader) {
+func ExecuteCommand(cmd_in string) (int16, []byte) {
     parts := strings.Fields(cmd_in)
 	head := parts[0]
 	parts = parts[1:len(parts)]
     cmd := exec.Command(head,parts...)
     cmd_stdout, _ := cmd.StdoutPipe()
     if err := cmd.Start(); err != nil {
-        return int16(2),bufio.NewReader(cmd_stdout)
+        return int16(2),nil
     }
-    return int16(0),bufio.NewReader(cmd_stdout)
+    stdout_reader := bufio.NewReader(cmd_stdout)
+    read_line,_,_ := stdout_reader.ReadLine()
+    result := cmd.Wait()
+    status := result.(*exec.ExitError).ProcessState.Sys().(syscall.WaitStatus)
+    return int16(status.ExitStatus()),read_line
 }
