@@ -28,6 +28,7 @@ go get ./...
 # Build!
 echo "--> Building..."
 cd common && go build common.go && cd ..
+cd read_config && go build read_config.go && cd ..
 cd check_nrpe && go build -o check_nrpe && cd ..
 go build  -o nrped
 cp nrped $GOPATH/bin
