@@ -11,3 +11,10 @@ func TestReadConfigInit(t *testing.T) {
         t.Error("Init failed to set FileName")
     }
 }
+func TestReadConfigReadFileConfig(t *testing.T) {
+    obj := new(ReadConfig)
+    obj.Init("nrpe-test.cfg")
+    if err := obj.ReadConfigFile(); err != nil {
+        t.Error("ReadConfigFile failed to read config file")
+    }
+}

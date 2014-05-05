@@ -25,7 +25,11 @@ type ReadConfig struct {
     //TODO implement everything
 }
 
+//TODO
+//design a constructor
 func (rc *ReadConfig) Init(file_name string) {
+    rc.AllowedCommands = make(map[string]string)
+    rc.ConfigMap = make(map[string]string)
     rc.FileName = file_name
 }
 
