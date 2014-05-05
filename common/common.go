@@ -1,9 +1,9 @@
 package common
 
 import (
-	"os"
+    "os"
     "bufio"
-	"fmt"
+    "fmt"
     "syscall"
     "hash/crc32"
     "bytes"
