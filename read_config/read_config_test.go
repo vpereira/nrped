@@ -28,7 +28,30 @@ func TestReadConfigReadCommands(t *testing.T) {
     if len(obj.AllowedCommands) == 0 {
         t.Error("ReadCommands failed to parse nrpe commands")
     }
-    if val,ok := obj.AllowedCommands["check_iostat"]; ok == false {
+    if _,ok := obj.AllowedCommands["check_iostat"]; ok == false {
         t.Error("ReadCommands failed to parse nrpe commands")
+    }
+}
+
+func TestReadConfigIsCommandAllowed( t *testing.T) {
+    obj := new(ReadConfig)
+    obj.Init("nrpe-test.cfg")
+    obj.ReadConfigFile()
+    obj.ReadCommands()
+    if obj.IsCommandAllowed("check_iostat") == false {
+        t.Error("IsCommandAllowed failed with check_iostat")
+    }
+    if obj.IsCommandAllowed("check_foobar") == true {
+        t.Error("IsCommandAllowed failed with check_foobar")
+    }
+}
+
+func TestReadConfigGetCommand( t *testing.T) {
+    obj := new(ReadConfig)
+    obj.Init("nrpe-test.cfg")
+    obj.ReadConfigFile()
+    obj.ReadCommands()
+    if obj.GetCommand("check_iostat") == "" {
+        t.Error("GetCommand failed with check_iostat")
     }
 }

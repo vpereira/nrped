@@ -49,3 +49,18 @@ func (rc *ReadConfig) ReadCommands() {
         }
     }
 }
+
+func (rc *ReadConfig) IsCommandAllowed(cmd string) bool {
+    if _,ok := rc.AllowedCommands[cmd]; ok {
+        return true
+    }else{
+        return false
+    }
+}
+
+func (rc *ReadConfig) GetCommand(cmd string) string {
+    if val,ok := rc.AllowedCommands[cmd]; ok {
+        return val
+    }
+    return ""
+}
