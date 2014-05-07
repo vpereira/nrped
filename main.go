@@ -6,19 +6,27 @@ import (
     "net"
     "github.com/vpereira/nrped/read_config"
     "github.com/vpereira/nrped/common"
+    "github.com/droundy/goopt"
 )
 
 
 func main() {
 
-    if len(os.Args) != 2 {
-        fmt.Fprintf(os.Stderr, "Usage: %s config-file\n", os.Args[0])
+    if len(os.Args) < 2 {
+        fmt.Fprintf(os.Stderr, "Usage: %s -h for help\n", os.Args[0])
         os.Exit(1)
     }
+    config_file := goopt.String([]string{"-c","--config"},"nrpe.cfg",
+    "config file to use")
+    //the first option, will be the default, if the -m isnt given
+    run_mode := goopt.Alternatives([]string{"-m", "--mode"},
+[]string{"foreground", "daemon", "systemd"},"operating mode")
+    goopt.Parse(nil)
 
-    config_file := os.Args[1]
+    //implement different run modes.. 
+    fmt.Println(*run_mode)
     config_obj := new(read_config.ReadConfig)
-    config_obj.Init(config_file)
+    config_obj.Init(*config_file)
     err := config_obj.ReadConfigFile();
     common.CheckError(err)
     //extract the commands command[cmd_name] = "/bin/foobar"
