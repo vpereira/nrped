@@ -31,13 +31,28 @@ func main() {
     common.CheckError(err)
     //extract the commands command[cmd_name] = "/bin/foobar"
     config_obj.ReadCommands()
-
+    //we have to read it from config
     service := ":5666"
-    tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
+    err = setupSocket(4,service,config_obj);
+    common.CheckError(err)
+}
+
+func setupSocket(socket_version int, service string, config_obj *read_config.ReadConfig) error {
+
+    socket_type := "tcp4"
+
+    if socket_version == 6 {
+        socket_type = "tcp6"
+    }
+
+    tcpAddr, err := net.ResolveTCPAddr(socket_type, service)
     common.CheckError(err)
 
-    listener, err := net.ListenTCP("tcp", tcpAddr)
-    common.CheckError(err)
+    listener, err := net.ListenTCP("tcp", tcpAddr) 
+
+    if err != nil {
+        return err
+    }
 
     for {
         if conn, err := listener.Accept(); err != nil {
@@ -47,6 +62,7 @@ func main() {
             go handleClient(conn,config_obj)
         }
     }
+    return nil
 }
 
 func handleClient(conn net.Conn,config_obj *read_config.ReadConfig) {
