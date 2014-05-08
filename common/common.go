@@ -46,7 +46,7 @@ const PROGRAM_VERSION = "0.02"
 type NrpePacket struct {
     PacketVersion int16
     PacketType int16
-    Crc32Value uint32
+    CRC32Value uint32
     ResultCode int16
     CommandBuffer [MAX_PACKETBUFFER_LENGTH]byte
 }
@@ -80,7 +80,7 @@ func SendPacket(conn net.Conn, pkt_send NrpePacket) error {
 
 func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
     var pkt_send NrpePacket = NrpePacket{PacketVersion:NRPE_PACKET_VERSION_2,
-            Crc32Value:0,ResultCode:STATE_UNKNOWN}
+            CRC32Value:0,ResultCode:STATE_UNKNOWN}
     if pkt_type == RESPONSE_PACKET {  //its a response
         pkt_send.PacketType = RESPONSE_PACKET
         if cmd == HELLO_COMMAND {
@@ -92,7 +92,7 @@ func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
         pkt_send.PacketType = QUERY_PACKET
         copy(pkt_send.CommandBuffer[:],cmd)
     }
-    pkt_send.Crc32Value,_ = DoCRC32(pkt_send)
+    pkt_send.CRC32Value,_ = DoCRC32(cmd)
     return pkt_send
 }
 
@@ -106,12 +106,8 @@ func FillRandomData() string {
     return string(buf)
 }
 
-func DoCRC32(pkt NrpePacket) (uint32, error) {
-    buf := new(bytes.Buffer)
-    if err := binary.Write(buf, binary.LittleEndian, &pkt); err != nil {
-        return uint32(0), err
-    }
-    return crc32.ChecksumIEEE(buf.Bytes()),nil
+func DoCRC32(cmd string) (uint32, error) {
+   return crc32.ChecksumIEEE([]byte(cmd)),nil
 }
 
 // count the numbers of bytes until 0 is found

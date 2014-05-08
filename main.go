@@ -69,7 +69,13 @@ func handleClient(conn net.Conn,config_obj *read_config.ReadConfig) {
 	// close connection on exit
     defer conn.Close()
     pkt_rcv,_ := common.ReceivePacket(conn)
+
     cmd := string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])])
+
+    if crc32,_ := common.DoCRC32(cmd); crc32 != pkt_rcv.CRC32Value {
+        fmt.Println("WARNING: CRC not matching",crc32,pkt_rcv.CRC32Value)
+    }
+
     pkt_send := common.PrepareToSend(cmd,common.RESPONSE_PACKET)
     if pkt_send.ResultCode == common.STATE_UNKNOWN { //its a response, but not to the HELLO_COMMAND
         if config_obj.IsCommandAllowed(cmd) {
