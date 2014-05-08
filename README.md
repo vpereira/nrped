@@ -1,7 +1,7 @@
 
-[![Build Status](https://travis-ci.org/vpereira/nrped.svg?branch=master)](https://travis-ci.org/vpereira/nrped)
-
 GO NRPE - Nagios Remote Plugin Executor 
+
+[![Build Status](https://travis-ci.org/vpereira/nrped.svg?branch=master)](https://travis-ci.org/vpereira/nrped)
 
 Contents
 --------
