@@ -55,3 +55,16 @@ func TestReadConfigGetCommand( t *testing.T) {
         t.Error("GetCommand failed with check_iostat")
     }
 }
+
+func TestReadConfigReadPrivileges( t *testing.T) {
+    obj := new(ReadConfig)
+    obj.Init("nrpe-test.cfg")
+    obj.ReadConfigFile()
+    obj.ReadPrivileges()
+    if obj.Nrpe_user == "" {
+        t.Error("ReadPrivileges failed")
+    }
+    if obj.Nrpe_group == "" {
+        t.Error("ReadPrivileges failed")
+    }
+ }

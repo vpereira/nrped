@@ -50,6 +50,18 @@ func (rc *ReadConfig) ReadCommands() {
     }
 }
 
+//TODO, for every option, loop through the ConfigMap? hm refactor it ASAP
+func (rc *ReadConfig) ReadPrivileges() {
+    for key, value := range rc.ConfigMap {
+        switch key {
+            case "nrpe_user":
+                rc.Nrpe_user = value
+            case "nrpe_group":
+                rc.Nrpe_group = value
+        }
+   }
+}
+
 func (rc *ReadConfig) IsCommandAllowed(cmd string) bool {
     if _,ok := rc.AllowedCommands[cmd]; ok {
         return true
