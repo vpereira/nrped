@@ -6,6 +6,7 @@ import (
     "net"
     "github.com/vpereira/nrped/read_config"
     "github.com/vpereira/nrped/common"
+    "github.com/vpereira/nrped/drop_privilege"
     "github.com/droundy/goopt"
 )
 
@@ -31,6 +32,11 @@ func main() {
     common.CheckError(err)
     //extract the commands command[cmd_name] = "/bin/foobar"
     config_obj.ReadCommands()
+    config_obj.ReadPrivileges()
+    //TODO check for errors
+    //what we gonna do with the group?
+    pwd := drop_privilege.Getpwnam(config_obj.Nrpe_user)
+    drop_privilege.DropPrivileges(int(pwd.Uid),int(pwd.Gid))
     //we have to read it from config
     service := ":5666"
     err = setupSocket(4,service,config_obj);
@@ -48,7 +54,7 @@ func setupSocket(socket_version int, service string, config_obj *read_config.Rea
     tcpAddr, err := net.ResolveTCPAddr(socket_type, service)
     common.CheckError(err)
 
-    listener, err := net.ListenTCP("tcp", tcpAddr) 
+    listener, err := net.ListenTCP("tcp", tcpAddr)
 
     if err != nil {
         return err
