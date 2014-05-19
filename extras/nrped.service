@@ -1,0 +1,13 @@
+[Unit]
+Description=NRPE Deamon
+After=syslog.target
+
+[Service]
+ExecStartPre=rm -f /var/run/nrped.pid
+ExecStart=/usr/sbin/nrped -c /etc/nrped/nrped.conf 
+PIDFile=/var/run/nrped.pid
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
