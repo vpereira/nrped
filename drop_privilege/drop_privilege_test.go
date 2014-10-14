@@ -1,12 +1,12 @@
 package drop_privilege
 
 import (
-    "testing"
+	"testing"
 )
 
 func TestGetpwnam(t *testing.T) {
-    pwd := Getpwnam("nobody")
-    if pwd == nil {
-        t.Error("getpwnam failed")
-    }
+	pwd := Getpwnam("nobody")
+	if pwd == nil {
+		t.Error("getpwnam failed")
+	}
 }
