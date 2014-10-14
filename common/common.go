@@ -127,6 +127,9 @@ func ExecuteCommand(cmd_in string) (int16, []byte) {
 	stdout_reader := bufio.NewReader(cmd_stdout)
 	read_line, _, _ := stdout_reader.ReadLine()
 	result := cmd.Wait()
-	status := result.(*exec.ExitError).ProcessState.Sys().(syscall.WaitStatus)
-	return int16(status.ExitStatus()), read_line
+	status := 0
+	if result != nil {
+		status = result.(*exec.ExitError).ProcessState.Sys().(syscall.WaitStatus).ExitStatus()
+	}
+	return int16(status), read_line
 }
