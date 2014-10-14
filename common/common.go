@@ -92,7 +92,7 @@ func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
 		pkt_send.PacketType = QUERY_PACKET
 		copy(pkt_send.CommandBuffer[:], cmd)
 	}
-	pkt_send.CRC32Value, _ = DoCRC32(cmd)
+	pkt_send.CRC32Value, _ = DoCRC32p(&pkt_send)
 	return pkt_send
 }
 
@@ -106,8 +106,30 @@ func FillRandomData() string {
 	return string(buf)
 }
 
+func DoCRC32p(pkt *NrpePacket) (uint32, error) {
+	pkt_calc := NrpePacket{
+		PacketVersion: pkt.PacketVersion,
+		PacketType:    pkt.PacketType,
+		CRC32Value:    uint32(0),
+		ResultCode:    pkt.ResultCode,
+		CommandBuffer: pkt.CommandBuffer}
+	pktbytes := pkt_calc.Encode()
+
+	return crc32.ChecksumIEEE(pktbytes), nil
+}
+
 func DoCRC32(cmd string) (uint32, error) {
 	return crc32.ChecksumIEEE([]byte(cmd)), nil
+}
+
+func (pkt *NrpePacket) Encode() []byte {
+	writer := new(bytes.Buffer)
+	binary.Write(writer, binary.BigEndian, pkt.PacketVersion)
+	binary.Write(writer, binary.BigEndian, pkt.PacketType)
+	binary.Write(writer, binary.BigEndian, pkt.CRC32Value)
+	binary.Write(writer, binary.BigEndian, pkt.ResultCode)
+	writer.Write([]byte(pkt.CommandBuffer[:]))
+	return writer.Bytes()
 }
 
 // count the numbers of bytes until 0 is found
