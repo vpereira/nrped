@@ -21,7 +21,7 @@ type Passwd struct {
 
 func Getpwnam(name string) *Passwd {
 	cname := C.CString(name)
-	defer C.cfree(unsafe.Pointer(cname))
+	defer C.free(unsafe.Pointer(cname))
 	cpw := C.getpwnam(cname)
 	return &Passwd{
 		Uid:   uint32(cpw.pw_uid),
