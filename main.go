@@ -76,9 +76,9 @@ func handleClient(conn net.Conn, config_obj *read_config.ReadConfig) {
 	pkt_rcv, _ := common.ReceivePacket(conn)
 
 	cmd := string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])])
-	// TODO: CRC32 does NOT match even if DoCRC32p
-	if crc32, _ := common.DoCRC32p(&pkt_rcv); crc32 != pkt_rcv.CRC32Value {
-		fmt.Println("WARNING: CRC not matching", crc32, pkt_rcv.CRC32Value)
+	pkt_rcv_crc32value := pkt_rcv.CRC32Value
+	if crc32, _ := common.DoCRC32(&pkt_rcv); crc32 != pkt_rcv_crc32value {
+		fmt.Println("WARNING: CRC not matching", crc32, pkt_rcv_crc32value)
 	}
 
 	pkt_send := common.PrepareToSend(cmd, common.RESPONSE_PACKET)
@@ -89,7 +89,7 @@ func handleClient(conn net.Conn, config_obj *read_config.ReadConfig) {
 			return_id, return_stdout := common.ExecuteCommand(str_cmd)
 			pkt_send.ResultCode = return_id
 			copy(pkt_send.CommandBuffer[:], return_stdout)
-			pkt_send.CRC32Value, _ = common.DoCRC32p(&pkt_send)
+			pkt_send.CRC32Value, _ = common.DoCRC32(&pkt_send)
 		} else {
 			pkt_send.ResultCode = common.STATE_CRITICAL
 		}

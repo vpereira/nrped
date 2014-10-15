@@ -49,6 +49,7 @@ type NrpePacket struct {
 	CRC32Value    uint32
 	ResultCode    int16
 	CommandBuffer [MAX_PACKETBUFFER_LENGTH]byte
+	Trailer       int16
 }
 
 func CheckError(err error) {
@@ -79,8 +80,7 @@ func SendPacket(conn net.Conn, pkt_send NrpePacket) error {
 }
 
 func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
-	var pkt_send NrpePacket = NrpePacket{PacketVersion: NRPE_PACKET_VERSION_2,
-		CRC32Value: 0, ResultCode: STATE_UNKNOWN}
+	pkt_send, _ := MakeNrpePacket()
 	if pkt_type == RESPONSE_PACKET { //its a response
 		pkt_send.PacketType = RESPONSE_PACKET
 		if cmd == HELLO_COMMAND {
@@ -92,34 +92,37 @@ func PrepareToSend(cmd string, pkt_type int16) NrpePacket {
 		pkt_send.PacketType = QUERY_PACKET
 		copy(pkt_send.CommandBuffer[:], cmd)
 	}
-	pkt_send.CRC32Value, _ = DoCRC32p(&pkt_send)
+	pkt_send.CRC32Value, _ = DoCRC32(&pkt_send)
 	return pkt_send
 }
 
-func FillRandomData() string {
+func MakeNrpePacket() (NrpePacket, error) {
+	pkt := new(NrpePacket)
+	buf := make([]byte, len(pkt.Encode()))
+
 	char := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 	rand.Seed(time.Now().UTC().UnixNano())
-	buf := make([]byte, 1024)
-	for i := 0; i < 1024; i++ {
+	for i := 0; i < len(buf); i++ {
 		buf[i] = char[rand.Intn(len(char)-1)]
 	}
-	return string(buf)
+	if err := binary.Read(bytes.NewReader(buf), binary.BigEndian, pkt); err != nil {
+		return *pkt, err
+	}
+
+	pkt.PacketVersion = NRPE_PACKET_VERSION_2
+	pkt.CRC32Value = 0
+	pkt.ResultCode = STATE_UNKNOWN
+	for i, _ := range pkt.CommandBuffer {
+		pkt.CommandBuffer[i] = '\x00'
+	}
+	return *pkt, nil
 }
 
-func DoCRC32p(pkt *NrpePacket) (uint32, error) {
-	pkt_calc := NrpePacket{
-		PacketVersion: pkt.PacketVersion,
-		PacketType:    pkt.PacketType,
-		CRC32Value:    uint32(0),
-		ResultCode:    pkt.ResultCode,
-		CommandBuffer: pkt.CommandBuffer}
-	pktbytes := pkt_calc.Encode()
+func DoCRC32(pkt *NrpePacket) (uint32, error) {
+	pkt.CRC32Value = 0
+	pktbytes := pkt.Encode()
 
 	return crc32.ChecksumIEEE(pktbytes), nil
-}
-
-func DoCRC32(cmd string) (uint32, error) {
-	return crc32.ChecksumIEEE([]byte(cmd)), nil
 }
 
 func (pkt *NrpePacket) Encode() []byte {
@@ -129,6 +132,7 @@ func (pkt *NrpePacket) Encode() []byte {
 	binary.Write(writer, binary.BigEndian, pkt.CRC32Value)
 	binary.Write(writer, binary.BigEndian, pkt.ResultCode)
 	writer.Write([]byte(pkt.CommandBuffer[:]))
+	binary.Write(writer, binary.BigEndian, pkt.Trailer)
 	return writer.Bytes()
 }
 
