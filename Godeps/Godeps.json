@@ -9,18 +9,6 @@
 		{
 			"ImportPath": "github.com/jimlawless/cfg",
 			"Rev": "4b1e3c1869d4e608fcbda6994e5f08dd9c6beaa1"
-		},
-		{
-			"ImportPath": "github.com/vpereira/nrped/common",
-			"Rev": "bfc6063ae2b71d94a1bbe3614a3cfeb0c556b6fa"
-		},
-		{
-			"ImportPath": "github.com/vpereira/nrped/drop_privilege",
-			"Rev": "bfc6063ae2b71d94a1bbe3614a3cfeb0c556b6fa"
-		},
-		{
-			"ImportPath": "github.com/vpereira/nrped/read_config",
-			"Rev": "bfc6063ae2b71d94a1bbe3614a3cfeb0c556b6fa"
 		}
 	]
 }
