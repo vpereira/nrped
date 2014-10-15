@@ -1,11 +1,11 @@
 package main
 
 import (
-	"./common"
-	"./drop_privilege"
-	"./read_config"
 	"fmt"
 	"github.com/droundy/goopt"
+	"github.com/vpereira/nrped/common"
+	"github.com/vpereira/nrped/drop_privilege"
+	"github.com/vpereira/nrped/read_config"
 	"net"
 	"os"
 )
