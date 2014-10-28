@@ -21,10 +21,6 @@ if [ "$(go env GOOS)" = "windows" ]; then
     EXTENSION=".exe"
 fi
 
-# Install dependencies
-echo "--> Installing dependencies to speed up builds..."
-go get ./...
-
 # Build!
 echo "--> Building..."
 cd common && go build common.go && cd ..
