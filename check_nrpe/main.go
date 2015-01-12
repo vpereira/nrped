@@ -14,6 +14,7 @@ func prepareConnection(endpoint string) net.Conn {
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	common.CheckError(err)
+	
 	if conn != nil {
 		return conn
 	}
