@@ -29,7 +29,7 @@ There are two pieces to this addon:
 
 NOTE:
 
-It's a ongoing project, however it works. There are some features missing, like SSL support, systemd integration, that will be done with the time. git pull are, as usual, welcome :o)
+It's a ongoing project, however it works. There are some features missing, like SSL support that will be done with the time. git pull are, as usual, welcome :o)
 
 
 Compiling it:
