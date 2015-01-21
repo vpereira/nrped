@@ -16,7 +16,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage: %s -h for help\n", os.Args[0])
 		os.Exit(1)
 	}
-	
+
 	config_file := goopt.String([]string{"-c", "--config"}, "nrpe.cfg",
 		"config file to use")
 	//the first option, will be the default, if the -m isnt given
@@ -68,7 +68,7 @@ func setupSocket(socket_version int, service string, config_obj *read_config.Rea
 			go handleClient(conn, config_obj)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -79,13 +79,13 @@ func handleClient(conn net.Conn, config_obj *read_config.ReadConfig) {
 
 	cmd := string(pkt_rcv.CommandBuffer[:common.GetLen(pkt_rcv.CommandBuffer[:])])
 	pkt_rcv_crc32value := pkt_rcv.CRC32Value
-	
+
 	if crc32, _ := common.DoCRC32(&pkt_rcv); crc32 != pkt_rcv_crc32value {
 		fmt.Println("WARNING: CRC not matching", crc32, pkt_rcv_crc32value)
 	}
 
 	pkt_send := common.PrepareToSend(cmd, common.RESPONSE_PACKET)
-	
+
 	if pkt_send.ResultCode == common.STATE_UNKNOWN { //its a response, but not to the HELLO_COMMAND
 		if config_obj.IsCommandAllowed(cmd) {
 			str_cmd := config_obj.GetCommand(cmd)
@@ -98,7 +98,7 @@ func handleClient(conn net.Conn, config_obj *read_config.ReadConfig) {
 			pkt_send.ResultCode = common.STATE_CRITICAL
 		}
 	}
-	
+
 	err := common.SendPacket(conn, pkt_send)
 	common.CheckError(err)
 }
