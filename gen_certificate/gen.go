@@ -12,72 +12,60 @@ import (
 	"time"
 )
 
-func main() {
+// creating self-signed certs
+// TODO, add the IP address in the certificate
+func createCertificate(country string, organization string,
+	organizationalUnit string, pemFile string, keyFile string) bool  {
+
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(7829),
 		Subject: pkix.Name{
-			Country: []string{"Germany"},
-			Organization: []string{"NRPED"},
-			OrganizationalUnit: []string{"CA Certificate"},
-		},
-		NotBefore: time.Now(),
-		NotAfter: time.Now().AddDate(10,0,0),
-		SubjectKeyId: []byte{1,2,3,4,5},
-		BasicConstraintsValid: true,
-		IsCA: true,
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage: x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign,
+			Country: []string{country},
+			Organization:[]string{organization},
+			OrganizationalUnit:[]string{organizationalUnit},
+			},
+			NotBefore: time.Now(),
+			NotAfter: time.Now().AddDate(10,0,0), // 10 years
+			SubjectKeyId: []byte{1,2,3,4,5},
+			BasicConstraintsValid: true,
+			IsCA: true,
+			ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
+				x509.ExtKeyUsageServerAuth},
+			KeyUsage: x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign,
 	}
 
 	priv, _ := rsa.GenerateKey(rand.Reader, 2048)
 	pub := &priv.PublicKey
 	ca_b, err := x509.CreateCertificate(rand.Reader, ca, ca, pub, priv)
+
 	if err != nil {
 		log.Println("create ca failed", err)
-		return
+		return false
 	}
-	ca_f := "ca.pem"
-	log.Println("write to", ca_f)
-	ioutil.WriteFile(ca_f, ca_b, 0777)
 
-	priv_f := "ca.key"
+	log.Println("write to", pemFile)
+	ioutil.WriteFile(pemFile, ca_b, 0777)
+
 	priv_b := x509.MarshalPKCS1PrivateKey(priv)
-	log.Println("write to", priv_f)
-	ioutil.WriteFile(priv_f, priv_b, 0777)
+	log.Println("write to", keyFile)
+	ioutil.WriteFile(keyFile, priv_b, 0777)
 
-	cert2 := &x509.Certificate{
-		SerialNumber: big.NewInt(3156),
-		Subject: pkix.Name{
-			Country: []string{"Germany"},
-			Organization: []string{"NRPED"},
-			OrganizationalUnit: []string{"Server"},
-		},
-		NotBefore: time.Now(),
-		NotAfter: time.Now().AddDate(10,0,0),
-		SubjectKeyId: []byte{1,2,3,4,6},
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage: x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign,
-	}
-	priv2, _ := rsa.GenerateKey(rand.Reader, 2048)
-	pub2 := &priv2.PublicKey
-	cert2_b, err2 := x509.CreateCertificate(rand.Reader, cert2, ca, pub2, priv)
-	if err2 != nil {
-		log.Println("create cert2 failed", err2)
+	return true
+}
+
+func main() {
+	ret := createCertificate("Germany","NRPED","Server","server.pem","server.key")
+
+	if ret != true {
+		log.Println("create ca failed")
 		return
 	}
 
-	cert2_f := "cert2.pem"
-	log.Println("write to", cert2_f)
-	ioutil.WriteFile(cert2_f, cert2_b, 0777)
+	ret = createCertificate("Germany","NRPED","Client","client.pem","client.key")
 
-	priv2_f := "cert2.key"
-	priv2_b := x509.MarshalPKCS1PrivateKey(priv2)
-	log.Println("write to", priv2_f)
-	ioutil.WriteFile(priv2_f, priv2_b, 0777)
+	if ret != true {
+		log.Println("create ca failed")
+		return
+	}
 
-	ca_c, _ := x509.ParseCertificate(ca_b)
-	cert2_c, _ := x509.ParseCertificate(cert2_b)
-
-	err3 := cert2_c.CheckSignatureFrom(ca_c)
-	log.Println("check signature", err3 == nil)
 }
