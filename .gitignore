@@ -5,3 +5,4 @@ check_nrpe/check_nrpe
 Godeps/_workspace
 *.key
 *.pem
+gen_certificate/gen_certificate
