@@ -1,8 +1,9 @@
 
-GO NRPE - Nagios Remote Plugin Executor 
+# GO NRPE - Nagios Remote Plugin Executor 
 
 [![Build Status](https://travis-ci.org/vpereira/nrped.svg?branch=master)](https://travis-ci.org/vpereira/nrped)
 
+## Status: Maintained
 Contents
 --------
 
