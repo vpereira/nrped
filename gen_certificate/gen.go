@@ -1,37 +1,36 @@
-
 package main
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"crypto/rsa"
-	"crypto/rand"
-	"math/big"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"time"
 )
 
 // creating self-signed certs
 // TODO, add the IP address in the certificate
 func createCertificate(country string, organization string,
-	organizationalUnit string, pemFile string, keyFile string) bool  {
+	organizationalUnit string, pemFile string, keyFile string) bool {
 
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(7829),
 		Subject: pkix.Name{
-			Country: []string{country},
-			Organization:[]string{organization},
-			OrganizationalUnit:[]string{organizationalUnit},
-			},
-			NotBefore: time.Now(),
-			NotAfter: time.Now().AddDate(10,0,0), // 10 years
-			SubjectKeyId: []byte{1,2,3,4,5},
-			BasicConstraintsValid: true,
-			IsCA: true,
-			ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
-				x509.ExtKeyUsageServerAuth},
-			KeyUsage: x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign,
+			Country:            []string{country},
+			Organization:       []string{organization},
+			OrganizationalUnit: []string{organizationalUnit},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(10, 0, 0), // 10 years
+		SubjectKeyId:          []byte{1, 2, 3, 4, 5},
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
+			x509.ExtKeyUsageServerAuth},
+		KeyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 	}
 
 	priv, _ := rsa.GenerateKey(rand.Reader, 2048)
@@ -54,14 +53,14 @@ func createCertificate(country string, organization string,
 }
 
 func main() {
-	ret := createCertificate("Germany","NRPED","Server","server.pem","server.key")
+	ret := createCertificate("Germany", "NRPED", "Server", "server.pem", "server.key")
 
 	if ret != true {
 		log.Println("create ca failed")
 		return
 	}
 
-	ret = createCertificate("Germany","NRPED","Client","client.pem","client.key")
+	ret = createCertificate("Germany", "NRPED", "Client", "client.pem", "client.key")
 
 	if ret != true {
 		log.Println("create ca failed")

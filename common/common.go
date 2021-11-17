@@ -112,7 +112,7 @@ func MakeNrpePacket() (NrpePacket, error) {
 	pkt.PacketVersion = NRPE_PACKET_VERSION_2
 	pkt.CRC32Value = 0
 	pkt.ResultCode = STATE_UNKNOWN
-	for i, _ := range pkt.CommandBuffer {
+	for i := range pkt.CommandBuffer {
 		pkt.CommandBuffer[i] = '\x00'
 	}
 	return *pkt, nil
@@ -144,7 +144,7 @@ func GetLen(b []byte) int {
 func ExecuteCommand(cmd_in string) (int16, []byte) {
 	parts := strings.Fields(cmd_in)
 	head := parts[0]
-	parts = parts[1:len(parts)]
+	parts = parts[1:]
 	cmd := exec.Command(head, parts...)
 	cmd_stdout, _ := cmd.StdoutPipe()
 	if err := cmd.Start(); err != nil {

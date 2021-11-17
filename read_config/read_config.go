@@ -3,8 +3,8 @@ package read_config
 import (
 	"fmt"
 	"github.com/jimlawless/cfg"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -15,7 +15,7 @@ type ReadConfig struct {
 	AllowedCommands map[string]string
 	FileName        string
 	ServerPort      uint16
-	TransportMode		uint16
+	TransportMode   uint16
 	CommandPrefix   string
 	Server          string
 	AllowedHosts    [MAX_ALLOWED_HOSTS]string
@@ -35,7 +35,6 @@ func (rc *ReadConfig) Init(file_name string) {
 	rc.FileName = file_name
 }
 
-
 func (rc *ReadConfig) ReadConfigFile() error {
 	if err := cfg.Load(rc.FileName, rc.ConfigMap); err != nil {
 		return err
@@ -46,7 +45,7 @@ func (rc *ReadConfig) ReadConfigFile() error {
 func (rc *ReadConfig) ReadTransportMode() {
 	for key, value := range rc.ConfigMap {
 		if key == "transport_mode" {
-			s,_ := strconv.Atoi(value)
+			s, _ := strconv.Atoi(value)
 			rc.TransportMode = uint16(s)
 		}
 	}
