@@ -1,12 +1,15 @@
 DEPS = $(go list -f '{{range .TestImports}}{{.}} {{end}}' ./...)
 
 all: deps
-	@mkdir -p bin/
+	@mkdir -p bin
+	go build -o bin/nrped
 	@bash --norc -i ./scripts/build.sh
 
 deps:
-	go get -d -v ./...
-	echo $(DEPS) | xargs -n1 go get -d
+	go mod tidy
 
 test: deps
 	go test ./...
+
+clean:
+	rm -rf bin

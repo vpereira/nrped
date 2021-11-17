@@ -1,0 +1,6 @@
+github.com/droundy/goopt v0.0.0-20170604162106-0b8effe182da h1:79H+mNJWOObWrQgbkSvvZ3t/D2lKWaTi9mu/v7fNRvg=
+github.com/droundy/goopt v0.0.0-20170604162106-0b8effe182da/go.mod h1:ytRJ64WkuW4kf6/tuYqBATBCRFUP8X9+LDtgcvE+koI=
+github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31 h1:bg4oHsGjsPxX869hm28e/vWbjemDGB6b9PwINRtnEkE=
+github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31/go.mod h1:9qhdPWwVn7/FE1L4TF4rMIix5Lyx8ip5WnHpQ3RiPFk=
+github.com/vpereira/nrped v0.0.0-20211117191835-7c238f152fa1 h1:Ir6FRJPVlp5tlxMOzQJ3I2lSJp19Tk78hnJKqcWRjRs=
+github.com/vpereira/nrped v0.0.0-20211117191835-7c238f152fa1/go.mod h1:45kViGYdvr1dLHYxpH3ydf2f+jriLirwyoUh/pX1lfU=
