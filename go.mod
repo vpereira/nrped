@@ -1,4 +1,4 @@
-module vpereira/nrped
+module github.com/vpereira/nrped
 
 go 1.16
 
